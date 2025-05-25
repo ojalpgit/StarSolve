@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Math Galaxy Game</title>
+    <style>
+      /* Basic page styling */
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        display: flex;
+        height: 100vh;
+        background: black;
+        color: white;
+      }
+
+      /* Panels on the left and right sides */
+      #left-panel,
+      #right-panel {
+        width: 20%;
+        padding: 20px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      /* Left panel with galaxy background */
+      #left-panel {
+        background-image: url(https://wallpapers.com/images/hd/galaxy-blue-aesthetic-e27srj3o1hb49bra.jpg);
+        background-size: cover;
+        color: white;
+      }
+
+      /* Center panel where 3D content appears */
+      #center-panel {
+        flex-grow: 1;
+        position: relative;
+      }
+
+      /* Ensures canvas fills its container */
+      canvas {
+        display: block;
+      }
+
+      /* Styling for UI sections */
+      #question-container,
+      #planet-selection,
+      #unlocked-planets {
+        margin-top: 20px;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      /* Planet option buttons */
+      .planet-option {
+        display: inline-block;
+        margin: 10px;
+        cursor: pointer;
+        font-size: 30px;
+      }
+
+      /* Display for unlocked planets */
+      .unlocked-planet {
+        text-align: center;
+      }
+
+      .unlocked-planet-name {
+        font-size: 12px;
+      }
+
+      /* Transparent backgrounds for all panels */
+      #left-panel,
+      #center-panel,
+      #right-panel {
+        background: none;
+      }
+
+      /* General button styling */
+      button {
+        margin-top: 10px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: none;
+        background-color: #4c9bef;
+        color: #f5f5f5;
+        cursor: pointer;
+      }
+
+      /* Invasion popup styling */
+      #invasion-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #222;
+        color: #eee;
+        padding: 20px;
+        border-radius: 8px;
+        z-index: 1000;
+        border: 2px solid red;
+        text-align: center;
+      }
+
+      /* Buttons inside invasion popup */
+      #invasion-popup button {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        background-color: #d9534f; /* Reddish for danger */
+        color: white;
+        cursor: pointer;
+      }
+
+      /* First button in popup styled differently (tribute) */
+      #invasion-popup button:first-child {
+        background-color: #f0ad4e; /* Yellowish for coins */
+      }
+
+      body.game-not-started #left-panel,
+      body.game-not-started #center-panel,
+      body.game-not-started #right-panel,
+      body.game-not-started #reset-view-button {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="game-not-started">
+    <!-- Start Screen -->
+    <div
+      id="start-screen"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url(images/steve-busch-vaknSP_Jrsg-unsplash.jpg);
+        background-size: cover;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+      "
+    >
+      <h1 style="font-family: Obitron; font-size: 4rem; margin-bottom: 20px">
+        StarSolve
+      </h1>
+      <button
+        id="start-button"
+        style="
+          padding: 15px 30px;
+          font-family: Obitron;
+          font-size: 1.5rem;
+          background-color: #949482;
+          border: none;
+          border-radius: 8px;
+          color: white;
+          cursor: pointer;
+        "
+      >
+        Begin Journey
+      </button>
+    </div>
+
+    <!-- Left side: game UI for questions, expansion, and current empire -->
+    <div id="left-panel">
+      <h1>Math Galaxy 🌌</h1>
+      <div id="coin-display" style="font-size: 20px; margin-bottom: 10px">
+        Coins: 0
+      </div>
+
+      <!-- Container for math questions -->
+      <div id="question-container">
+        <p id="question"></p>
+        <input type="number" id="answer" placeholder="Your answer" />
+        <button id="submit-answer-button">Submit</button>
+        <p id="feedback"></p>
+      </div>
+
+      <!-- Button to expand empire (unlock planets) -->
+      <div id="expand-button-container" style="margin-top: 10px">
+        <button id="expand-empire-button" style="display: none">
+          Expand Empire
+        </button>
+      </div>
+
+      <!-- Planet selection interface -->
+      <div id="planet-selection" style="display: none">
+        <button id="back-button" style="display: none">Back</button>
+        <h2>Expand Your Empire</h2>
+        <div id="available-planets"></div>
+      </div>
+
+      <!-- Display of unlocked planets -->
+      <div id="unlocked-planets">
+        <h2>Your Empire</h2>
+        <div id="current-empire"></div>
+      </div>
+    </div>
+
+    <!-- Center panel for rendering Three.js 3D solar system -->
+    <div id="center-panel">
+      <button
+        id="reset-view-button"
+        style="position: absolute; top: 10px; right: 20px; z-index: 10"
+      >
+        🔄 Reset View
+      </button>
+    </div>
+
+    <!-- Right panel for showing selected planet info -->
+    <div id="right-panel">
+      <div id="info">
+        <h3>Select a planet</h3>
+        <p>Click a planet to see info here!</p>
+      </div>
+    </div>
+
+    <!-- Main JavaScript module -->
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
